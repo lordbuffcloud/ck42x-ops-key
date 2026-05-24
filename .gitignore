@@ -1,0 +1,6 @@
+logs/
+*.log
+.env
+*.secret
+*.key
+.DS_Store

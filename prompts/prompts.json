@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "prompts": [
+    {
+      "id": "repo-status",
+      "title": "Repo status and next safe checks",
+      "instruction": "Inspect the current repository state and propose a small set of safe commands to understand branch, dirty files, recent commits, and obvious verification checks. Do not modify files."
+    },
+    {
+      "id": "test-triage",
+      "title": "Test/lint/build triage",
+      "instruction": "Given the working directory context, propose safe test, lint, or build commands that would verify the project with minimal blast radius. Prefer package-manager scripts when visible from context; otherwise propose common diagnostics only."
+    },
+    {
+      "id": "windows-health",
+      "title": "Windows workstation health snapshot",
+      "instruction": "Propose read-only PowerShell commands to inspect processes, services, disk, and basic workstation health. Do not change services, registry, Defender, firewall, scheduled tasks, or startup settings."
+    },
+    {
+      "id": "dev-lab-brief",
+      "title": "Dev-lab situation brief",
+      "instruction": "Propose a concise read-only command set that helps summarize current dev-lab state from this directory: repo status, recent commits, likely project type, and next verification gate."
+    }
+  ]
+}
