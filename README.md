@@ -83,6 +83,20 @@ Flipper BadUSB wants `.txt` payloads. Copy one of these to the Flipper SD card u
 
 The first-run key payload does **not** embed the API key in the payload or repo. It prompts locally and writes the key to the Windows user environment.
 
+If you intentionally want a Flipper card preloaded with the API key, generate a **private** payload locally:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$HOME\ck42x-ops-key\scripts\new-private-deepseek-payload.ps1"
+```
+
+That writes:
+
+```text
+private-payloads\launch-deepseek-shell-agent-private-key.txt
+```
+
+Copy that private `.txt` file to the Flipper SD card under `badusb/`. This generated file contains the DeepSeek key in plaintext. Treat that Flipper SD card like a password. Do not commit, upload, screenshot, or share it. If the Flipper or payload leaks, revoke/rotate the DeepSeek key.
+
 Legacy `.ducky` copies are also kept in `ducky/` for tooling that expects that extension.
 
 ## Local Ops Key install

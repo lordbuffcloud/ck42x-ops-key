@@ -24,6 +24,8 @@ Restart PowerShell after setting them.
 
 The first-run DeepSeek key payload is allowed because it does **not** store a real key in GitHub source. It prompts locally with `Read-Host`, writes the pasted key to the Windows user environment, and passes it only to the current local PowerShell process.
 
+If you intentionally generate a private preloaded-key payload with `scripts/new-private-deepseek-payload.ps1`, the generated file contains the DeepSeek key in plaintext. It is written under `private-payloads/`, which is gitignored. Do not commit, upload, screenshot, or share it. If the Flipper or SD card is lost or shared, revoke/rotate the key immediately.
+
 ## Remote script boundary
 
 The DeepSeek Shell Agent payload downloads this tagged file:
