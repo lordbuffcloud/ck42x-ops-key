@@ -1,24 +1,42 @@
 # Security Notes
 
-CK42X Ops Key is intentionally shaped as a local, review-gated launcher. It is not a stealth automation payload.
+CK42X Ops Key is intentionally shaped as a review-gated launcher set. It is not a stealth automation payload.
 
 ## Hard rules
 
-- Do not put API keys in Ducky payloads.
+- Do not put API keys in Ducky/Flipper payloads.
 - Do not pipe GitHub/raw URLs into PowerShell execution.
 - Do not run from a mutable `main` branch during device launch.
+- If a payload fetches a script, pin it to a version tag and verify SHA256 before running.
 - Do not allow model output to execute silently.
 - Do not use this on machines you do not own or administer.
 
 ## Secret handling
 
-Set API keys outside the repo, preferably as a user-scoped environment variable:
+Set API keys outside the repo, preferably as user-scoped environment variables:
 
 ```powershell
+[Environment]::SetEnvironmentVariable('DEEPSEEK_API_KEY','REPLACE_WITH_DEEPSEEK_KEY','User')
 [Environment]::SetEnvironmentVariable('OPENROUTER_API_KEY','REPLACE_WITH_OPENROUTER_KEY','User')
 ```
 
-Restart PowerShell after setting it.
+Restart PowerShell after setting them.
+
+## Remote script boundary
+
+The DeepSeek Shell Agent payload downloads this tagged file:
+
+```text
+https://raw.githubusercontent.com/lordbuffcloud/ck42x-ops-key/v0.2.0/scripts/ck42x-deepseek-shell.ps1
+```
+
+It saves the file to `%TEMP%`, verifies this SHA256, then runs it:
+
+```text
+9607ce4cb26f2af09cfbffbca952bc9adcd1f8f3b68c27f7587f959c944a6f73
+```
+
+That is intentionally different from unsafe `irm | iex` or `iwr | iex` patterns. Updating the script requires a new tag, a new checksum, and a new payload.
 
 ## Execution safety
 
@@ -27,7 +45,7 @@ Default mode is dry-run/review-only. `-Execute` still requires confirmation for 
 Blocked patterns include:
 
 - `Invoke-Expression`, `iex`, encoded commands, Base64 command execution
-- remote download helpers such as `irm`, `iwr`, `curl`, `wget`
+- remote download piped into execution
 - destructive filesystem commands
 - registry/security/firewall/Defender changes
 - scheduled-task/persistence creation
@@ -36,10 +54,10 @@ Blocked patterns include:
 
 ## Publishing
 
-If this project is pushed to GitHub, first verify there are no secrets:
+Before pushing or releasing, verify there are no secrets:
 
 ```powershell
-git grep -n "sk-\|OPENAI_API_KEY=\|OPENROUTER_API_KEY="
+git grep -n "sk-\|OPENAI_API_KEY=\|OPENROUTER_API_KEY=\|DEEPSEEK_API_KEY="
 ```
 
 The sample docs may mention variable names, but should never include real keys.
