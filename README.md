@@ -1,30 +1,50 @@
 # CK42X Ops Key
 
-A safe local launcher for LLM-assisted shell operations.
+A safe Flipper Zero / Rubber Ducky launcher for local LLM-assisted shell operations.
 
-The design is deliberately bounded:
+This is **not** a remote-code-execution payload. The payload only opens PowerShell and starts a local script that the user installed first.
 
-- Flipper/Rubber Ducky only launches a **local** PowerShell script.
-- No API keys are embedded in payloads or source files.
-- No `irm | iex`, no mutable remote script execution, no silent shell autonomy.
-- Default mode is dry-run/review-only.
-- `-Execute` mode still requires human confirmation for each allowlisted command.
+## How it works
 
-## Files
+```text
+Flipper BadUSB .txt payload
+  -> opens Windows Run
+  -> starts %USERPROFILE%\ck42x-ops-key\scripts\ck42x-ops.ps1
+  -> script reads the user's local API key from an environment variable
+  -> script asks OpenRouter/OpenAI for a cautious command plan
+  -> default mode prints the plan only
+  -> optional -Execute mode asks before each allowlisted command
+```
 
-- `scripts/ck42x-ops.ps1` — local LLM-assisted ops harness.
-- `scripts/install.ps1` — copies project to `%USERPROFILE%\ck42x-ops-key` for the Ducky payload path.
-- `prompts/prompts.json` — preset prompt library.
-- `ducky/launch-ck42x-ops-key.ducky` — review-only launcher.
-- `ducky/launch-ck42x-ops-key-execute-gated.ducky` — gated execution launcher.
-- `SECURITY.md` — operating boundaries.
+The important part: **the Flipper payload does not contain an API key and does not download or run a GitHub script.** Users install the repo locally, set their own API key, then the payload launches that local install.
 
-## Setup
+## Public GitHub install
 
-From PowerShell:
+Repository:
+
+```text
+https://github.com/lordbuffcloud/ck42x-ops-key
+```
+
+Install from PowerShell:
 
 ```powershell
-cd $HOME\ck42x-ops-key
+cd $HOME
+git clone https://github.com/lordbuffcloud/ck42x-ops-key.git
+cd ck42x-ops-key
+```
+
+If the user downloaded a zip instead of cloning, extract it so this path exists:
+
+```text
+%USERPROFILE%\ck42x-ops-key\scripts\ck42x-ops.ps1
+```
+
+## Set API key
+
+OpenRouter is the default provider. Set the key locally, outside the repo:
+
+```powershell
 [Environment]::SetEnvironmentVariable('OPENROUTER_API_KEY','REPLACE_WITH_OPENROUTER_KEY','User')
 ```
 
@@ -36,7 +56,7 @@ Optional OpenAI provider:
 [Environment]::SetEnvironmentVariable('OPENAI_API_KEY','REPLACE_WITH_OPENAI_KEY','User')
 ```
 
-## Run manually
+## Run manually first
 
 Review-only mode:
 
@@ -62,18 +82,23 @@ Use a custom prompt:
 powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File "$HOME\ck42x-ops-key\scripts\ck42x-ops.ps1" -PromptId test-triage -PromptText "Focus on the smallest checks for this Node project."
 ```
 
-## Ducky use
+## Flipper Zero payloads
 
-Load one of these onto the Ducky/Flipper BadUSB app:
+Flipper BadUSB wants `.txt` payloads. Copy one of these to the Flipper SD card under `badusb/`:
 
-- `ducky/launch-ck42x-ops-key.ducky` — opens review-only mode.
-- `ducky/launch-ck42x-ops-key-execute-gated.ducky` — opens confirm-before-each-command mode.
+- `payloads/flipper/launch-ck42x-ops-key.txt` — review-only launcher.
+- `payloads/flipper/launch-ck42x-ops-key-execute-gated.txt` — confirm-before-each-command mode.
 
-The payload assumes this project exists at:
+Legacy `.ducky` copies are also kept in `ducky/` for tooling that expects that extension.
 
-```text
-%USERPROFILE%\ck42x-ops-key
-```
+## Files
+
+- `scripts/ck42x-ops.ps1` — local LLM-assisted ops harness.
+- `scripts/install.ps1` — copies project to `%USERPROFILE%\ck42x-ops-key` for the payload path.
+- `prompts/prompts.json` — preset prompt library.
+- `payloads/flipper/*.txt` — Flipper Zero BadUSB payloads.
+- `ducky/*.ducky` — same payload content with Ducky extension.
+- `SECURITY.md` — operating boundaries.
 
 ## Prompt presets
 
@@ -82,6 +107,20 @@ The payload assumes this project exists at:
 - `windows-health` — read-only workstation health snapshot.
 - `dev-lab-brief` — concise dev-lab status brief from the current directory.
 
+## Safety model
+
+Default mode is dry-run/review-only. `-Execute` still requires confirmation for each command and only allows a narrow set of diagnostic/test commands.
+
+Blocked patterns include:
+
+- `Invoke-Expression`, `iex`, encoded commands, Base64 command execution
+- remote download helpers such as `irm`, `iwr`, `curl`, `wget`
+- destructive filesystem commands
+- registry/security/firewall/Defender changes
+- scheduled-task/persistence creation
+- user/group/account changes
+- remote shell and file transfer commands
+
 ## Public release posture
 
-This repo is safe to open-source only if it contains no real keys, host-specific private notes, or personal paths beyond generic Windows examples. Run the checks in `SECURITY.md` before pushing.
+This repo is intended to be safe to open-source: no real keys, no host-specific private notes, no local CK42X infrastructure references, and no remote pipe-to-exec bootstrap.

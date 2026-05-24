@@ -1,0 +1,10 @@
+REM CK42X Ops Key launcher
+REM Safe shape: launches a LOCAL script from the current user's profile.
+REM No API keys, no remote download, no pipe-to-exec.
+REM First install/copy this project to: %USERPROFILE%\ck42x-ops-key
+
+DELAY 1000
+GUI r
+DELAY 300
+STRING powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File "%USERPROFILE%\ck42x-ops-key\scripts\ck42x-ops.ps1" -PromptId repo-status
+ENTER

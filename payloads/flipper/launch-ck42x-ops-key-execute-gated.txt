@@ -1,0 +1,9 @@
+REM CK42X Ops Key launcher — gated execution mode
+REM Still requires human confirmation for each allowlisted command.
+REM No API keys, no remote download, no pipe-to-exec.
+
+DELAY 1000
+GUI r
+DELAY 300
+STRING powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File "%USERPROFILE%\ck42x-ops-key\scripts\ck42x-ops.ps1" -PromptId repo-status -Execute
+ENTER
