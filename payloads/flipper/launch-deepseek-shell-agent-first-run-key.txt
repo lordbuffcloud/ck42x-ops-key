@@ -1,0 +1,9 @@
+REM CK42X DeepSeek Shell Agent first-run key launcher
+REM Does NOT embed the API key. If DEEPSEEK_API_KEY is missing, prompts user to paste it,
+REM stores it as a user env var, then downloads the tagged PS1, verifies SHA256, and runs review-only prompt chooser.
+
+DELAY 1000
+GUI r
+DELAY 300
+STRING powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$k=[Environment]::GetEnvironmentVariable('DEEPSEEK_API_KEY','User');if([string]::IsNullOrWhiteSpace($k)){$k=Read-Host 'Paste DeepSeek API key';[Environment]::SetEnvironmentVariable('DEEPSEEK_API_KEY',$k,'User');$env:DEEPSEEK_API_KEY=$k};$u='https://raw.githubusercontent.com/lordbuffcloud/ck42x-ops-key/v0.2.0/scripts/ck42x-deepseek-shell.ps1';$s='9607ce4cb26f2af09cfbffbca952bc9adcd1f8f3b68c27f7587f959c944a6f73';$p=Join-Path $env:TEMP 'ck42x-deepseek-shell.ps1';Invoke-WebRequest -UseBasicParsing $u -OutFile $p;$h=(Get-FileHash $p -Algorithm SHA256).Hash.ToLower();if($h -ne $s){throw 'CK42X script SHA256 mismatch'};& $p -ChoosePrompt"
+ENTER

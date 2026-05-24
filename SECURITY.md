@@ -22,6 +22,8 @@ Set API keys outside the repo, preferably as user-scoped environment variables:
 
 Restart PowerShell after setting them.
 
+The first-run DeepSeek key payload is allowed because it does **not** store a real key in GitHub source. It prompts locally with `Read-Host`, writes the pasted key to the Windows user environment, and passes it only to the current local PowerShell process.
+
 ## Remote script boundary
 
 The DeepSeek Shell Agent payload downloads this tagged file:

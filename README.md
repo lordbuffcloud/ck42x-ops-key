@@ -75,10 +75,13 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$HOME\ck42x-ops-key\scr
 
 Flipper BadUSB wants `.txt` payloads. Copy one of these to the Flipper SD card under `badusb/`:
 
-- `payloads/flipper/launch-deepseek-shell-agent.txt` — downloads the tagged DeepSeek shell script, verifies SHA256, then opens the review-only preset chooser.
+- `payloads/flipper/launch-deepseek-shell-agent-first-run-key.txt` — first-run launcher. If `DEEPSEEK_API_KEY` is missing, it prompts the user to paste the key, stores it as a user-scoped environment variable, then launches the review-only preset chooser.
+- `payloads/flipper/launch-deepseek-shell-agent.txt` — downloads the tagged DeepSeek shell script, verifies SHA256, then opens the review-only preset chooser. Requires `DEEPSEEK_API_KEY` to already be set.
 - `payloads/flipper/launch-deepseek-shell-agent-execute-gated.txt` — same, but adds `-Execute`; commands still require allowlist approval and per-command confirmation.
 - `payloads/flipper/launch-ck42x-ops-key.txt` — local installed OpenRouter/OpenAI Ops Key launcher.
 - `payloads/flipper/launch-ck42x-ops-key-execute-gated.txt` — local installed Ops Key launcher with gated execution.
+
+The first-run key payload does **not** embed the API key in the payload or repo. It prompts locally and writes the key to the Windows user environment.
 
 Legacy `.ducky` copies are also kept in `ducky/` for tooling that expects that extension.
 
